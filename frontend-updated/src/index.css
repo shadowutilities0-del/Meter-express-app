@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #1E2422;
+  --color-ink-soft: #525F58;
+  --color-paper: #EDEFEF;
+  --color-card: #F7F8F6;
+  --color-copper: #B5651D;
+  --color-copper-bright: #D97D34;
+  --color-moss: #4B5D45;
+  --color-moss-light: #D6E0D1;
+  --color-line: #CBD0CA;
+  --color-divider-dark: #33413B;
+
+  --font-display: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono-custom: 'JetBrains Mono', monospace;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  margin: 0;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.btn-copper {
+  background: var(--color-copper);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0.25rem;
+  transition: background 0.2s;
+}
+.btn-copper:hover {
+  background: var(--color-copper-bright);
+}
+
+.btn-line {
+  border: 1px solid var(--color-ink);
+  color: var(--color-ink);
+  font-weight: 600;
+  padding: 0.6rem 1.25rem;
+  border-radius: 0.25rem;
+  background: transparent;
+  transition: all 0.2s;
+}
+.btn-line:hover {
+  background: var(--color-ink);
+  color: #fff;
+}
+
+.accent-underline {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 14px;
+}
+.accent-underline svg {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 10px;
+}
