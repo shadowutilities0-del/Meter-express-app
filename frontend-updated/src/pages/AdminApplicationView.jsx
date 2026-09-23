@@ -20,11 +20,9 @@ import {
 } from 'lucide-react';
 import ThemeBackground from '../components/ThemeBackground';
 import Modal from '../components/Modal';
-import ChatPanel from '../components/ChatPanel';
 import {
   getApplicationByRef,
   refreshApplicationFromServer,
-  addMessage,
   updateApplication,
   renameReference,
   requestMoreInfo,
@@ -112,6 +110,15 @@ export default function AdminApplicationView() {
 
   const [noteText, setNoteText] = useState('');
 
+  // In-page document preview (replaces window.open, which browsers like
+  // Edge can silently block even when triggered synchronously from a
+  // click). previewDoc holds the document being viewed; previewUrl is the
+  // blob: URL created from its stored data for the <iframe>/<img> to load.
+  const [previewDoc, setPreviewDoc] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [previewMime, setPreviewMime] = useState('');
+  const [previewError, setPreviewError] = useState('');
+
   const [editingRef, setEditingRef] = useState(false);
   const [refDraft, setRefDraft] = useState('');
   const [refSaving, setRefSaving] = useState(false);
@@ -135,6 +142,12 @@ export default function AdminApplicationView() {
   useEffect(() => {
     loadFresh();
   }, [loadFresh]);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
 
   const refresh = () => loadFresh();
 
@@ -170,11 +183,6 @@ export default function AdminApplicationView() {
     } finally {
       setRefSaving(false);
     }
-  };
-
-  const handleSendMessage = (text) => {
-    addMessage(ref, { channel: 'customer', author: adminName, role: 'staff', text });
-    refresh();
   };
 
   const setStatus = (status) => {
@@ -247,6 +255,78 @@ export default function AdminApplicationView() {
     a.click();
   };
 
+  // FIX: "View" opens the document in a new tab instead of downloading it.
+  //
+  // The important detail: browsers BLOCK top-level navigation to a `data:`
+  // URL as an anti-phishing measure, so `window.open(doc.data)` either
+  // returns null or lands on a blank tab — that's why View appeared to do
+  // nothing. A blob: URL is not blocked, so the stored data URL has to be
+  // converted into a Blob first.
+  //
+  // fetch() parses the data URL natively (including the base64 decode and
+  // the mime type), which avoids the fragile hand-rolled atob/byte-array
+  // decoding this used to do.
+  //
+  // Note: only PDFs, images and plain text render inline. Word/Excel/zip
+  // files will still download — no browser can preview those.
+  // FIX: previews the document INSIDE the app (a modal with an iframe)
+  // instead of opening a new browser tab. window.open() turned out to be
+  // unreliable here — Edge (and other browsers) can silently block it even
+  // when called synchronously from the click, with no way to recover
+  // control of that new tab afterwards. Rendering the file in an iframe on
+  // this page sidesteps popup blockers entirely, since nothing ever tries
+  // to open a new window.
+  const handleViewDoc = async (doc) => {
+    if (!doc.data) {
+      alert(
+        'This document has no stored content and cannot be viewed. ' +
+          'It may have been uploaded before file content was saved.'
+      );
+      return;
+    }
+
+    setPreviewError('');
+    setPreviewDoc(doc);
+    setPreviewUrl('');
+    setPreviewMime('');
+
+    try {
+      // fetch() parses the data: URL natively (base64 decode + mime type),
+      // which is more robust than hand-rolled atob/byte-array decoding.
+      const blob = await (await fetch(doc.data)).blob();
+      setPreviewMime(blob.type || '');
+      setPreviewUrl(URL.createObjectURL(blob));
+    } catch (err) {
+      setPreviewError('Could not load this document. Try Download instead.');
+    }
+  };
+
+  const closePreview = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewDoc(null);
+    setPreviewUrl('');
+    setPreviewMime('');
+    setPreviewError('');
+  };
+
+  // Mime type (from the actual file content, captured by the browser at
+  // upload time) is the reliable signal — unlike the document's display
+  // name, which staff can type as anything ("Site plan") with no
+  // extension at all. Extension is only a fallback for the rare case a
+  // mime type comes back empty or generic (application/octet-stream).
+  const getPreviewKind = (doc, mime) => {
+    const m = (mime || '').toLowerCase();
+    if (m.startsWith('image/')) return 'image';
+    if (m === 'application/pdf') return 'pdf';
+    if (m.startsWith('text/') || m === 'application/json') return 'text';
+
+    const name = (doc?.name || '').toLowerCase();
+    if (/\.(png|jpe?g|gif|webp|svg|bmp)$/.test(name)) return 'image';
+    if (/\.pdf$/.test(name)) return 'pdf';
+    if (/\.(txt|csv|log|json)$/.test(name)) return 'text';
+    return 'unsupported';
+  };
+
   const handleDeleteDoc = (doc) => {
     const confirmed = window.confirm(`Delete ${doc.name}?`);
     if (!confirmed) return;
@@ -274,7 +354,7 @@ export default function AdminApplicationView() {
           </p>
           <button
             onClick={() => navigate('/admin-dashboard')}
-            className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2.5 rounded-md transition"
+            className="w-full bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2.5 rounded-md transition"
           >
             Back to admin dashboard
           </button>
@@ -299,7 +379,7 @@ export default function AdminApplicationView() {
 
           <Link
             to="/admin-dashboard"
-            className="inline-flex items-center gap-2 text-sm text-[#525F58] hover:text-[#2563EB] transition mb-6"
+            className="inline-flex items-center gap-2 text-sm text-[#525F58] hover:text-[#3B82F6] transition mb-6"
           >
             <ArrowLeft size={16} />
             Back to admin dashboard
@@ -331,14 +411,14 @@ export default function AdminApplicationView() {
                         if (e.key === 'Escape') cancelEditRef();
                       }}
                       disabled={refSaving}
-                      className="font-display text-[28px] font-bold text-[#2563EB] bg-white border border-[#2563EB] rounded-md px-2 py-0.5 w-64 focus:outline-none"
+                      className="font-display text-[28px] font-bold text-[#3B82F6] bg-white border border-[#3B82F6] rounded-md px-2 py-0.5 w-64 focus:outline-none"
                     />
                     <button
                       type="button"
                       onClick={saveRef}
                       disabled={refSaving}
                       title="Save"
-                      className="text-[#2563EB] hover:text-[#1D4ED8] disabled:opacity-40"
+                      className="text-[#3B82F6] hover:text-[#2563EB] disabled:opacity-40"
                     >
                       <Check size={20} />
                     </button>
@@ -356,12 +436,12 @@ export default function AdminApplicationView() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2 group">
-                  <h1 className="font-display text-[40px] leading-none font-bold text-[#2563EB]">{app.ref}</h1>
+                  <h1 className="font-display text-[40px] leading-none font-bold text-[#3B82F6]">{app.ref}</h1>
                   <button
                     type="button"
                     onClick={startEditRef}
                     title="Change reference number"
-                    className="text-[#8A938D] hover:text-[#2563EB] transition opacity-60 hover:opacity-100"
+                    className="text-[#8A938D] hover:text-[#3B82F6] transition opacity-60 hover:opacity-100"
                   >
                     <Pencil size={16} />
                   </button>
@@ -426,7 +506,7 @@ export default function AdminApplicationView() {
                         <button
                           type="button"
                           onClick={handleClearInfoRequest}
-                          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#2563EB] hover:underline"
+                          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-[#3B82F6] hover:underline"
                         >
                           <CheckCircle2 size={14} />
                           Mark as Reviewed
@@ -439,20 +519,6 @@ export default function AdminApplicationView() {
                 </section>
               )}
 
-              {/* Messages with the customer */}
-              <section>
-                <h2 className="font-display text-lg font-semibold text-[#1E2422] mb-3">
-                  Messages with {app.applicantName}
-                </h2>
-                <ChatPanel
-                  messages={(app.messages || []).filter((m) => m.channel === 'customer')}
-                  currentRole="staff"
-                  onSend={handleSendMessage}
-                  placeholder="Message the applicant about this application..."
-                  emptyText="No messages yet."
-                  heightClass="h-[320px]"
-                />
-              </section>
             </div>
 
             {/* Sidebar — quick actions & status */}
@@ -466,7 +532,7 @@ export default function AdminApplicationView() {
                       setOpenSection('details');
                       setShowDetailsModal(true);
                     }}
-                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#2563EB] hover:text-[#2563EB] transition"
+                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
                   >
                     <Eye size={15} />
                     View Application Details
@@ -477,7 +543,7 @@ export default function AdminApplicationView() {
                       refresh();
                       setShowDocumentsModal(true);
                     }}
-                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#2563EB] hover:text-[#2563EB] transition"
+                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
                   >
                     <FolderOpen size={15} />
                     View Documents
@@ -485,7 +551,7 @@ export default function AdminApplicationView() {
                   <button
                     type="button"
                     onClick={() => setShowNotesModal(true)}
-                    className="w-full flex items-center justify-between gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#2563EB] hover:text-[#2563EB] transition"
+                    className="w-full flex items-center justify-between gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
                   >
                     <span className="flex items-center gap-2.5">
                       <Bell size={15} />
@@ -511,7 +577,7 @@ export default function AdminApplicationView() {
                     <button
                       type="button"
                       onClick={() => setStatus('In Progress')}
-                      className="w-full flex items-center gap-2.5 text-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-md px-4 py-2.5 transition"
+                      className="w-full flex items-center gap-2.5 text-sm text-white bg-[#3B82F6] hover:bg-[#2563EB] rounded-md px-4 py-2.5 transition"
                     >
                       <PlayCircle size={15} />
                       Start Review
@@ -522,7 +588,7 @@ export default function AdminApplicationView() {
                     <button
                       type="button"
                       onClick={() => setStatus('Quote Issued')}
-                      className="w-full flex items-center gap-2.5 text-sm text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-md px-4 py-2.5 transition"
+                      className="w-full flex items-center gap-2.5 text-sm text-white bg-[#3B82F6] hover:bg-[#2563EB] rounded-md px-4 py-2.5 transition"
                     >
                       <FileCheck size={15} />
                       Issue Quote
@@ -576,13 +642,13 @@ export default function AdminApplicationView() {
                       onChange={(e) => setInfoQuestion(e.target.value)}
                       rows={3}
                       placeholder="e.g. Please confirm the gas meter location..."
-                      className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB] resize-none"
+                      className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6] resize-none"
                     />
                     <button
                       type="button"
                       onClick={handleRequestInfo}
                       disabled={!infoQuestion.trim()}
-                      className="w-full mt-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-full mt-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Send Request
                     </button>
@@ -596,7 +662,7 @@ export default function AdminApplicationView() {
                   <select
                     value={app.status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] focus:outline-none focus:border-[#3B82F6]"
                   >
                     {STATUS_OPTIONS.map((s) => (
                       <option key={s} value={s}>{s}</option>
@@ -720,7 +786,7 @@ export default function AdminApplicationView() {
                   value={docType}
                   onChange={(e) => setDocType(e.target.value)}
                   placeholder="e.g. Site plan"
-                  className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                 />
               </div>
               <div>
@@ -728,7 +794,7 @@ export default function AdminApplicationView() {
                 <input
                   type="file"
                   onChange={handleFileChange}
-                  className="w-full text-sm text-[#525F58] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-[#CBD0CA] file:bg-white file:text-sm file:font-medium file:text-[#525F58] hover:file:border-[#2563EB]"
+                  className="w-full text-sm text-[#525F58] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-[#CBD0CA] file:bg-white file:text-sm file:font-medium file:text-[#525F58] hover:file:border-[#3B82F6]"
                 />
               </div>
             </div>
@@ -736,7 +802,7 @@ export default function AdminApplicationView() {
               type="button"
               onClick={handleUpload}
               disabled={!pendingFile || uploading}
-              className="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2 px-4 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2 px-4 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Paperclip size={14} />
               {uploading ? 'Uploading…' : 'Upload'}
@@ -761,8 +827,16 @@ export default function AdminApplicationView() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       type="button"
+                      onClick={() => handleViewDoc(doc)}
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#525F58] border border-[#CBD0CA] rounded-md px-3 py-1.5 hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
+                    >
+                      <Eye size={13} />
+                      View
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => handleDownloadDoc(doc)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2563EB] border border-[#CBD0CA] rounded-md px-3 py-1.5 hover:border-[#2563EB] transition"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#3B82F6] border border-[#CBD0CA] rounded-md px-3 py-1.5 hover:border-[#3B82F6] transition"
                     >
                       <Download size={13} />
                       Download
@@ -793,7 +867,7 @@ export default function AdminApplicationView() {
               onChange={(e) => setNoteText(e.target.value.slice(0, 5000))}
               rows={4}
               placeholder="Type your note here..."
-              className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-3 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB] resize-none"
+              className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-3 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6] resize-none"
             />
             <div className="flex items-center justify-between mt-2">
               <span className="text-xs text-[#8A938D]">{noteText.length} / 5000</span>
@@ -801,7 +875,7 @@ export default function AdminApplicationView() {
                 type="button"
                 onClick={handleAddNote}
                 disabled={!noteText.trim()}
-                className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2 px-5 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2 px-5 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Add Note
               </button>
@@ -824,6 +898,77 @@ export default function AdminApplicationView() {
                   </div>
                 ))}
               </div>
+            )}
+          </div>
+        </Modal>
+      )}
+
+      {/* ---------------- DOCUMENT PREVIEW MODAL ---------------- */}
+      {previewDoc && (
+        <Modal
+          title={previewDoc.name}
+          onClose={closePreview}
+          widthClass="max-w-4xl"
+        >
+          <div className="min-h-[60vh] flex flex-col">
+            {previewError ? (
+              <div className="flex-1 flex items-center justify-center py-16">
+                <p className="text-sm text-red-600">{previewError}</p>
+              </div>
+            ) : !previewUrl ? (
+              <div className="flex-1 flex items-center justify-center py-16">
+                <p className="text-sm text-[#8A938D]">Loading document…</p>
+              </div>
+            ) : (
+              (() => {
+                const kind = getPreviewKind(previewDoc, previewMime);
+                if (kind === 'pdf') {
+                  return (
+                    <iframe
+                      src={previewUrl}
+                      title={previewDoc.name}
+                      className="w-full flex-1 min-h-[60vh] rounded-md border border-[#EDEFEF]"
+                    />
+                  );
+                }
+                if (kind === 'image') {
+                  return (
+                    <div className="flex-1 flex items-center justify-center bg-[#F7F8F6] rounded-md border border-[#EDEFEF] p-4">
+                      <img
+                        src={previewUrl}
+                        alt={previewDoc.name}
+                        className="max-w-full max-h-[70vh] object-contain"
+                      />
+                    </div>
+                  );
+                }
+                if (kind === 'text') {
+                  return (
+                    <iframe
+                      src={previewUrl}
+                      title={previewDoc.name}
+                      className="w-full flex-1 min-h-[60vh] rounded-md border border-[#EDEFEF] bg-white"
+                    />
+                  );
+                }
+                // Word/Excel/zip/etc — browsers can't render these inline
+                // at all, so offer Download instead of a broken preview.
+                return (
+                  <div className="flex-1 flex flex-col items-center justify-center gap-4 py-16 text-center">
+                    <p className="text-sm text-[#525F58]">
+                      This file type can't be previewed in the browser.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadDoc(previewDoc)}
+                      className="inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2 px-4 rounded-md transition"
+                    >
+                      <Download size={14} />
+                      Download {previewDoc.name}
+                    </button>
+                  </div>
+                );
+              })()
             )}
           </div>
         </Modal>

@@ -174,7 +174,7 @@ function DocumentUploadField({ entries, onAddEntry, onRemoveEntry, maxFiles }) {
               onChange={(e) => setDocType(e.target.value)}
               placeholder="e.g. Site plan"
               disabled={isFull}
-              className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB] disabled:bg-[#F7F8F6] disabled:cursor-not-allowed"
+              className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6] disabled:bg-[#F7F8F6] disabled:cursor-not-allowed"
             />
           </div>
 
@@ -185,7 +185,7 @@ function DocumentUploadField({ entries, onAddEntry, onRemoveEntry, maxFiles }) {
               type="file"
               onChange={handleFileChange}
               disabled={isFull}
-              className="w-full text-sm text-[#525F58] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-[#CBD0CA] file:bg-white file:text-sm file:font-medium file:text-[#525F58] hover:file:border-[#2563EB] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full text-sm text-[#525F58] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-[#CBD0CA] file:bg-white file:text-sm file:font-medium file:text-[#525F58] hover:file:border-[#3B82F6] disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
         </div>
@@ -194,7 +194,7 @@ function DocumentUploadField({ entries, onAddEntry, onRemoveEntry, maxFiles }) {
           type="button"
           onClick={handleAdd}
           disabled={!pendingFile || isFull}
-          className="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2 px-4 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2 px-4 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <UploadCloud size={14} />
           {isFull ? 'File limit reached' : 'Add file'}
@@ -523,7 +523,7 @@ export default function CustomerNewApplication() {
           </p>
           <button
             onClick={() => navigate('/customer-dashboard')}
-            className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2.5 rounded-md transition"
+            className="w-full bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2.5 rounded-md transition"
           >
             Back to dashboard
           </button>
@@ -557,7 +557,7 @@ export default function CustomerNewApplication() {
           </p>
           <button
             onClick={() => navigate('/customer-dashboard')}
-            className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2.5 rounded-md transition"
+            className="w-full bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2.5 rounded-md transition"
           >
             Back to dashboard
           </button>
@@ -578,7 +578,7 @@ export default function CustomerNewApplication() {
 
           <Link
             to="/customer-dashboard"
-            className="inline-flex items-center gap-2 text-sm text-[#525F58] hover:text-[#2563EB] transition mb-6"
+            className="inline-flex items-center gap-2 text-sm text-[#525F58] hover:text-[#3B82F6] transition mb-6"
           >
             <ArrowLeft size={16} />
             Back to dashboard
@@ -624,7 +624,7 @@ export default function CustomerNewApplication() {
                         value={form.firstName}
                         onChange={(e) => updateField('firstName', e.target.value)}
                         placeholder="e.g. Tisha"
-                        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                         required
                       />
                     </div>
@@ -637,7 +637,7 @@ export default function CustomerNewApplication() {
                         value={form.lastName}
                         onChange={(e) => updateField('lastName', e.target.value)}
                         placeholder="e.g. Sharma"
-                        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                         required
                       />
                     </div>
@@ -650,7 +650,7 @@ export default function CustomerNewApplication() {
                         value={form.email}
                         onChange={(e) => updateField('email', e.target.value)}
                         placeholder="you@example.com"
-                        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                         required
                       />
                     </div>
@@ -663,7 +663,7 @@ export default function CustomerNewApplication() {
                         value={form.phone}
                         onChange={(e) => updateField('phone', e.target.value)}
                         placeholder="07123 456789"
-                        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                         required
                       />
                     </div>
@@ -674,7 +674,7 @@ export default function CustomerNewApplication() {
               {lockedFromProfile && (
                 <p className="text-xs text-[#8A938D] mt-3">
                   These details come from your account.{' '}
-                  <Link to="/customer-dashboard" className="text-[#2563EB] font-semibold hover:underline">
+                  <Link to="/customer-dashboard" className="text-[#3B82F6] font-semibold hover:underline">
                     Update them in Profile
                   </Link>{' '}
                   if anything's changed.
@@ -697,7 +697,7 @@ export default function CustomerNewApplication() {
                     value={form.companyName}
                     onChange={(e) => updateField('companyName', e.target.value)}
                     placeholder="e.g. BuildCo Ltd"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                   />
                 </div>
                 <div>
@@ -709,7 +709,7 @@ export default function CustomerNewApplication() {
                     value={form.companyNumber}
                     onChange={(e) => updateField('companyNumber', e.target.value)}
                     placeholder="e.g. 01234567"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                   />
                 </div>
                 <div>
@@ -721,7 +721,7 @@ export default function CustomerNewApplication() {
                     value={form.companyPropertyNumber}
                     onChange={(e) => updateField('companyPropertyNumber', e.target.value)}
                     placeholder="e.g. Unit 4"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                   />
                 </div>
                 <div>
@@ -733,7 +733,7 @@ export default function CustomerNewApplication() {
                     value={form.companyStreetName}
                     onChange={(e) => updateField('companyStreetName', e.target.value)}
                     placeholder="e.g. Riverside Estate"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                   />
                 </div>
                 <div>
@@ -745,7 +745,7 @@ export default function CustomerNewApplication() {
                     value={form.companyTown}
                     onChange={(e) => updateField('companyTown', e.target.value)}
                     placeholder="e.g. London"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                   />
                 </div>
                 <div>
@@ -757,7 +757,7 @@ export default function CustomerNewApplication() {
                     value={form.companyPostcode}
                     onChange={(e) => updateField('companyPostcode', e.target.value)}
                     placeholder="e.g. SE1 9GF"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                   />
                 </div>
               </div>
@@ -783,7 +783,7 @@ export default function CustomerNewApplication() {
                     value={form.propertyNumber}
                     onChange={(e) => updateField('propertyNumber', e.target.value)}
                     placeholder="e.g. 77A"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                     required
                   />
                 </div>
@@ -796,7 +796,7 @@ export default function CustomerNewApplication() {
                     value={form.streetName}
                     onChange={(e) => updateField('streetName', e.target.value)}
                     placeholder="e.g. Central Avenue"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                     required
                   />
                 </div>
@@ -809,7 +809,7 @@ export default function CustomerNewApplication() {
                     value={form.town}
                     onChange={(e) => updateField('town', e.target.value)}
                     placeholder="e.g. Enfield"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                     required
                   />
                 </div>
@@ -822,7 +822,7 @@ export default function CustomerNewApplication() {
                     value={form.postcode}
                     onChange={(e) => updateField('postcode', e.target.value)}
                     placeholder="e.g. EN1 3QF"
-                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                    className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                     required
                   />
                 </div>
@@ -846,11 +846,11 @@ export default function CustomerNewApplication() {
                       onClick={() => toggleUtility(u.key)}
                       className={`flex flex-col items-center gap-2 rounded-xl border px-4 py-4 text-sm font-medium transition ${
                         isSelected
-                          ? 'border-[#2563EB] bg-[#DCE6F5]/50 text-[#2C5A9A]'
-                          : 'border-[#CBD0CA] text-[#525F58] hover:border-[#2563EB]'
+                          ? 'border-[#3B82F6] bg-[#DCE6F5]/50 text-[#2C5A9A]'
+                          : 'border-[#CBD0CA] text-[#525F58] hover:border-[#3B82F6]'
                       }`}
                     >
-                      <Icon size={20} className={isSelected ? 'text-[#2563EB]' : 'text-[#8A938D]'} />
+                      <Icon size={20} className={isSelected ? 'text-[#3B82F6]' : 'text-[#8A938D]'} />
                       {u.label}
                     </button>
                   );
@@ -881,11 +881,11 @@ export default function CustomerNewApplication() {
                         onClick={() => setRequestType(r.key)}
                         className={`flex flex-col items-center gap-2 rounded-xl border px-4 py-4 text-sm font-medium transition ${
                           isSelected
-                            ? 'border-[#2563EB] bg-[#DCE6F5]/50 text-[#2C5A9A]'
-                            : 'border-[#CBD0CA] text-[#525F58] hover:border-[#2563EB]'
+                            ? 'border-[#3B82F6] bg-[#DCE6F5]/50 text-[#2C5A9A]'
+                            : 'border-[#CBD0CA] text-[#525F58] hover:border-[#3B82F6]'
                         }`}
                       >
-                        <Icon size={20} className={isSelected ? 'text-[#2563EB]' : 'text-[#8A938D]'} />
+                        <Icon size={20} className={isSelected ? 'text-[#3B82F6]' : 'text-[#8A938D]'} />
                         {r.label}
                       </button>
                     );
@@ -915,7 +915,7 @@ export default function CustomerNewApplication() {
                   placeholder="e.g. We're building a two-storey extension and need a new water and electric connection routed from the main road to the property boundary..."
                   rows={5}
                   maxLength={WORK_DESCRIPTION_MAX_LENGTH}
-                  className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB] resize-none"
+                  className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6] resize-none"
                 />
                 <p className="text-xs text-[#8A938D] mt-1.5 text-right">
                   {form.workDescription.length}/{WORK_DESCRIPTION_MAX_LENGTH}
@@ -979,7 +979,7 @@ export default function CustomerNewApplication() {
               <button
                 type="submit"
                 disabled={!isValid || isSubmitting}
-                className="bg-[#2563EB] hover:bg-[#1D4ED8] disabled:bg-[#CBD0CA] disabled:cursor-not-allowed text-white font-semibold text-sm py-2.5 px-6 rounded-md transition"
+                className="bg-[#3B82F6] hover:bg-[#2563EB] disabled:bg-[#CBD0CA] disabled:cursor-not-allowed text-white font-semibold text-sm py-2.5 px-6 rounded-md transition"
               >
                 {isSubmitting
                   ? 'Submitting...'

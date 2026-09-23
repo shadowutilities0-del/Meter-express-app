@@ -166,7 +166,7 @@ export default function DocumentsTab({ applicationRef, applicationId }) {
         <button
           type="button"
           onClick={() => setShowNewFolder((v) => !v)}
-          className="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2 px-4 rounded-md transition"
+          className="inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2 px-4 rounded-md transition"
         >
           <FolderPlus size={14} />
           New Folder
@@ -183,7 +183,7 @@ export default function DocumentsTab({ applicationRef, applicationId }) {
             onChange={(e) => setNewFolderName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleCreateFolder()}
             placeholder="Folder name (e.g. ID Proof)"
-            className="flex-1 bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+            className="flex-1 bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
           />
           <button
             type="button"
@@ -245,14 +245,14 @@ export default function DocumentsTab({ applicationRef, applicationId }) {
                           onClick={() => viewFile(f.data)}
                           title="View"
                         >
-                          <Eye size={12} className="text-[#8A938D] hover:text-[#2563EB]" />
+                          <Eye size={12} className="text-[#8A938D] hover:text-[#3B82F6]" />
                         </button>
                         <button
                           type="button"
                           onClick={() => triggerDownload(f.data, f.originalName)}
                           title="Download"
                         >
-                          <Download size={12} className="text-[#8A938D] hover:text-[#2563EB]" />
+                          <Download size={12} className="text-[#8A938D] hover:text-[#3B82F6]" />
                         </button>
                         <button
                           type="button"
@@ -269,7 +269,7 @@ export default function DocumentsTab({ applicationRef, applicationId }) {
                   )}
                 </ul>
 
-                <label className="inline-flex items-center gap-1.5 text-xs font-medium text-[#525F58] border border-[#CBD0CA] rounded-md px-3 py-1.5 cursor-pointer hover:border-[#2563EB] hover:text-[#2563EB] transition">
+                <label className="inline-flex items-center gap-1.5 text-xs font-medium text-[#525F58] border border-[#CBD0CA] rounded-md px-3 py-1.5 cursor-pointer hover:border-[#3B82F6] hover:text-[#3B82F6] transition">
                   {uploadingFolder === folder.name ? "Uploading…" : "+ Upload file"}
                   <input
                     type="file"

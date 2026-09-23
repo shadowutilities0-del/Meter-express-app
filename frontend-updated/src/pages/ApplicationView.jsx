@@ -13,8 +13,8 @@ import {
   ChevronDown,
   ChevronUp,
   Paperclip,
-  Trash2,
   Clock,
+  FileUp,
   ChevronRight,
 } from 'lucide-react';
 import ThemeBackground from '../components/ThemeBackground';
@@ -24,7 +24,6 @@ import {
   respondToInfoRequest,
   cancelApplication,
   addDocument,
-  deleteDocument,
   addNote,
   getProgress,
 } from '../utils/applicationsStore';
@@ -202,14 +201,6 @@ export default function ApplicationView() {
     a.click();
   };
 
-  const handleDeleteDoc = (doc) => {
-    const confirmed = window.confirm(`Delete ${doc.name}?`);
-    if (!confirmed) return;
-
-    deleteDocument(ref, doc.id);
-    refreshApp();
-  };
-
   const handleAddNote = () => {
     if (!noteText.trim()) return;
 
@@ -240,7 +231,7 @@ export default function ApplicationView() {
 
           <button
             onClick={() => navigate('/customer-dashboard')}
-            className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2.5 rounded-md transition"
+            className="w-full bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2.5 rounded-md transition"
           >
             Back to dashboard
           </button>
@@ -256,6 +247,29 @@ export default function ApplicationView() {
   const isCancellable = !NON_CANCELLABLE.includes(app.status);
   const documents = app.documents || [];
   const notes = app.notes || [];
+
+  // Combined, time-sorted feed for the "Updates" section: notes (including
+  // the automatic "Status changed to ..." system notes added by the
+  // backend) plus document uploads, newest first. This is what makes every
+  // kind of activity on the application — status changes, staff/customer
+  // notes, and new document uploads — show up in one place instead of only
+  // showing notes.
+  const updates = [
+    ...notes.map((n) => ({
+      id: n.id,
+      time: n.time,
+      kind: n.role === 'system' ? 'status' : 'note',
+      text: n.text,
+      author: n.author,
+    })),
+    ...documents.map((d) => ({
+      id: `doc-${d.id}`,
+      time: d.uploadedAt,
+      kind: 'document',
+      text: `Uploaded document "${d.name}"`,
+      author: d.uploadedBy,
+    })),
+  ].sort((a, b) => new Date(b.time) - new Date(a.time));
 
   return (
     <div className="min-h-screen flex relative">
@@ -279,7 +293,7 @@ export default function ApplicationView() {
 
           <Link
             to="/customer-dashboard"
-            className="inline-flex items-center gap-2 text-sm text-[#525F58] hover:text-[#2563EB] transition mb-6"
+            className="inline-flex items-center gap-2 text-sm text-[#525F58] hover:text-[#3B82F6] transition mb-6"
           >
             <ArrowLeft size={16} />
             Back to dashboard
@@ -295,7 +309,7 @@ export default function ApplicationView() {
                 <StatusPill status={app.status} />
               </div>
 
-              <h1 className="font-display text-[40px] leading-none font-bold text-[#2563EB]">
+              <h1 className="font-display text-[40px] leading-none font-bold text-[#3B82F6]">
                 {app.ref}
               </h1>
 
@@ -306,7 +320,7 @@ export default function ApplicationView() {
 
             <Link
               to={`/applications/${app.ref}/edit`}
-              className="shrink-0 inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2.5 px-5 rounded-md transition"
+              className="shrink-0 inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2.5 px-5 rounded-md transition"
             >
               <Pencil size={15} />
               Edit
@@ -433,7 +447,7 @@ export default function ApplicationView() {
                       onChange={(e) => setResponseText(e.target.value)}
                       rows={4}
                       placeholder="Please provide the information requested..."
-                      className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-3 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB] resize-none"
+                      className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-3 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6] resize-none"
                     />
 
                     <p className="text-xs text-[#8A938D] mt-3">
@@ -441,7 +455,7 @@ export default function ApplicationView() {
                       <button
                         type="button"
                         onClick={() => setShowDocumentsModal(true)}
-                        className="text-[#2563EB] font-medium hover:underline"
+                        className="text-[#3B82F6] font-medium hover:underline"
                       >
                         View Documents
                       </button>{' '}
@@ -452,7 +466,7 @@ export default function ApplicationView() {
                       type="button"
                       onClick={handleSubmitResponse}
                       disabled={!responseText.trim()}
-                      className="w-full mt-5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2.5 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-full mt-5 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2.5 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       Submit Response
                     </button>
@@ -526,40 +540,50 @@ export default function ApplicationView() {
                     Updates
                   </h2>
 
-                  {notes.length > 0 && (
-                    <span className="text-xs font-semibold bg-[#2563EB] text-white rounded-full px-2 py-0.5">
-                      {notes.length}
+                  {updates.length > 0 && (
+                    <span className="text-xs font-semibold bg-[#3B82F6] text-white rounded-full px-2 py-0.5">
+                      {updates.length}
                     </span>
                   )}
                 </div>
 
-                {notes.length === 0 ? (
+                {updates.length === 0 ? (
                   <p className="text-sm text-[#8A938D]">No updates yet.</p>
                 ) : (
                   <div className="space-y-3">
-                    {[...notes]
-                      .reverse()
-                      .slice(0, 4)
-                      .map((n) => (
+                    {updates.slice(0, 4).map((u) => {
+                      const Icon = u.kind === 'document' ? FileUp : u.kind === 'status' ? Bell : Paperclip;
+                      const borderClass =
+                        u.kind === 'document'
+                          ? 'border-[#4B9E6B]'
+                          : u.kind === 'status'
+                          ? 'border-[#B5651D]'
+                          : 'border-[#3B82F6]';
+                      return (
                         <div
-                          key={n.id}
-                          className="border-l-2 border-[#2563EB] bg-[#F7F8F6] rounded-r-lg px-4 py-3"
+                          key={u.id}
+                          className={`border-l-2 ${borderClass} bg-[#F7F8F6] rounded-r-lg px-4 py-3`}
                         >
-                          <p className="text-sm text-[#1E2422]">{n.text}</p>
+                          <div className="flex items-start gap-2">
+                            <Icon size={14} className="text-[#8A938D] mt-0.5 shrink-0" />
+                            <p className="text-sm text-[#1E2422]">{u.text}</p>
+                          </div>
 
-                          <p className="text-xs text-[#8A938D] mt-1">
-                            {n.author} · {timeAgo(n.time)}
+                          <p className="text-xs text-[#8A938D] mt-1 pl-[22px]">
+                            {u.author ? `${u.author} · ` : ''}
+                            {timeAgo(u.time)}
                           </p>
                         </div>
-                      ))}
+                      );
+                    })}
 
-                    {notes.length > 4 && (
+                    {updates.length > 4 && (
                       <button
                         type="button"
                         onClick={() => setShowNotesModal(true)}
-                        className="text-sm font-medium text-[#2563EB] hover:underline"
+                        className="text-sm font-medium text-[#3B82F6] hover:underline"
                       >
-                        View all {notes.length} updates
+                        View all {updates.length} updates
                       </button>
                     )}
                   </div>
@@ -580,7 +604,7 @@ export default function ApplicationView() {
                       setOpenSection('details');
                       setShowDetailsModal(true);
                     }}
-                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#2563EB] hover:text-[#2563EB] transition"
+                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
                   >
                     <Eye size={15} />
                     View Application Details
@@ -589,7 +613,7 @@ export default function ApplicationView() {
                   <button
                     type="button"
                     onClick={() => setShowDocumentsModal(true)}
-                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#2563EB] hover:text-[#2563EB] transition"
+                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
                   >
                     <FolderOpen size={15} />
                     View Documents
@@ -598,7 +622,7 @@ export default function ApplicationView() {
                   <button
                     type="button"
                     onClick={handleDownloadPdf}
-                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#2563EB] hover:text-[#2563EB] transition"
+                    className="w-full flex items-center gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
                   >
                     <Download size={15} />
                     Download Application PDF
@@ -607,7 +631,7 @@ export default function ApplicationView() {
                   <button
                     type="button"
                     onClick={() => setShowNotesModal(true)}
-                    className="w-full flex items-center justify-between gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#2563EB] hover:text-[#2563EB] transition"
+                    className="w-full flex items-center justify-between gap-2.5 text-sm text-[#1E2422] border border-[#EDEFEF] rounded-md px-4 py-2.5 hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
                   >
                     <span className="flex items-center gap-2.5">
                       <Bell size={15} />
@@ -643,7 +667,7 @@ export default function ApplicationView() {
                     Overall Progress
                   </span>
 
-                  <span className="text-xs font-semibold text-[#2563EB]">
+                  <span className="text-xs font-semibold text-[#3B82F6]">
                     {progress.percent}%
                   </span>
                 </div>
@@ -651,7 +675,7 @@ export default function ApplicationView() {
                 <div className="w-full h-1.5 bg-[#EDEFEF] rounded-full mb-5 overflow-hidden">
                   <div
                     className={`h-full rounded-full ${
-                      progress.cancelled ? 'bg-red-400' : 'bg-[#2563EB]'
+                      progress.cancelled ? 'bg-red-400' : 'bg-[#3B82F6]'
                     }`}
                     style={{ width: `${progress.percent}%` }}
                   />
@@ -670,7 +694,7 @@ export default function ApplicationView() {
                             stage.state === 'done'
                               ? 'bg-[#4B5D45]'
                               : stage.state === 'current'
-                              ? 'bg-[#2563EB]'
+                              ? 'bg-[#3B82F6]'
                               : 'bg-[#CBD0CA]'
                           }`}
                         />
@@ -927,7 +951,7 @@ export default function ApplicationView() {
                   value={docType}
                   onChange={(e) => setDocType(e.target.value)}
                   placeholder="e.g. Site plan"
-                  className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full bg-white border border-[#CBD0CA] rounded-md px-3 py-2 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                 />
               </div>
 
@@ -939,7 +963,7 @@ export default function ApplicationView() {
                 <input
                   type="file"
                   onChange={handleFileChange}
-                  className="w-full text-sm text-[#525F58] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-[#CBD0CA] file:bg-white file:text-sm file:font-medium file:text-[#525F58] hover:file:border-[#2563EB]"
+                  className="w-full text-sm text-[#525F58] file:mr-3 file:py-2 file:px-3 file:rounded-md file:border file:border-[#CBD0CA] file:bg-white file:text-sm file:font-medium file:text-[#525F58] hover:file:border-[#3B82F6]"
                 />
               </div>
             </div>
@@ -948,7 +972,7 @@ export default function ApplicationView() {
               type="button"
               onClick={handleUpload}
               disabled={!pendingFile || uploading}
-              className="inline-flex items-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2 px-4 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2 px-4 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Paperclip size={14} />
               {uploading ? 'Uploading…' : 'Upload'}
@@ -987,20 +1011,13 @@ export default function ApplicationView() {
                     <button
                       type="button"
                       onClick={() => handleDownloadDoc(doc)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#2563EB] border border-[#CBD0CA] rounded-md px-3 py-1.5 hover:border-[#2563EB] transition"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#3B82F6] border border-[#CBD0CA] rounded-md px-3 py-1.5 hover:border-[#3B82F6] transition"
                     >
                       <Download size={13} />
                       Download
                     </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleDeleteDoc(doc)}
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-red-600 border border-[#CBD0CA] rounded-md px-3 py-1.5 hover:border-red-500 transition"
-                    >
-                      <Trash2 size={13} />
-                      Delete
-                    </button>
+                    {/* Customers cannot delete a document once it's uploaded —
+                        only Admin/Staff can (see AdminApplicationView.jsx). */}
                   </div>
                 </div>
               ))}
@@ -1027,7 +1044,7 @@ export default function ApplicationView() {
               }
               rows={4}
               placeholder="Type your note here..."
-              className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-3 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB] resize-none"
+              className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-3 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6] resize-none"
             />
 
             <div className="flex items-center justify-between mt-2">
@@ -1039,7 +1056,7 @@ export default function ApplicationView() {
                 type="button"
                 onClick={handleAddNote}
                 disabled={!noteText.trim()}
-                className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2 px-5 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2 px-5 rounded-md transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Add Note
               </button>
@@ -1048,32 +1065,32 @@ export default function ApplicationView() {
 
           <div className="pt-5 border-t border-[#EDEFEF]">
             <p className="text-sm font-semibold text-[#1E2422] mb-3">
-              Notes History
+              Full History
             </p>
 
-            {notes.length === 0 ? (
+            {updates.length === 0 ? (
               <p className="text-sm text-[#8A938D] py-4 text-center">
-                No notes yet.
+                No updates yet.
               </p>
             ) : (
               <div className="space-y-3">
-                {[...notes].reverse().map((n) => (
+                {updates.map((u) => (
                   <div
-                    key={n.id}
+                    key={u.id}
                     className="border border-[#EDEFEF] rounded-lg px-4 py-3"
                   >
                     <p className="text-sm font-medium text-[#1E2422]">
-                      {n.author}{' '}
+                      {u.author || 'System'}{' '}
                       <span className="text-xs font-normal text-[#8A938D]">
-                        ({n.role})
+                        ({u.kind === 'document' ? 'document' : u.kind === 'status' ? 'status' : 'note'})
                       </span>{' '}
                       <span className="text-xs text-[#8A938D]">
-                        · {timeAgo(n.time)}
+                        · {timeAgo(u.time)}
                       </span>
                     </p>
 
                     <p className="text-sm text-[#525F58] mt-1">
-                      {n.text}
+                      {u.text}
                     </p>
                   </div>
                 ))}

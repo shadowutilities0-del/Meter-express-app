@@ -38,7 +38,7 @@ export default function ThemeBackground() {
       <div
         className="absolute -right-24 -top-24 w-[420px] h-[420px] opacity-[0.08] rotate-12"
         style={{
-          background: 'linear-gradient(135deg, #2C5A9A 0%, #2563EB 100%)',
+          background: 'linear-gradient(135deg, #2C5A9A 0%, #3B82F6 100%)',
           clipPath: 'polygon(50% 0, 100% 50%, 50% 100%, 0 50%)',
         }}
       />

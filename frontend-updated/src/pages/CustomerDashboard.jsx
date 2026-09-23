@@ -106,7 +106,7 @@ function SettingsField({ label, value, onChange, type = 'text', placeholder }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+        className="w-full bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
       />
     </div>
   );
@@ -182,14 +182,14 @@ function ApplicationsTable({ apps, onView }) {
                         e.stopPropagation();
                         onView(app);
                       }}
-                      className="w-8 h-8 flex items-center justify-center rounded-md border border-[#CBD0CA] text-[#525F58] hover:border-[#2563EB] hover:text-[#2563EB] transition"
+                      className="w-8 h-8 flex items-center justify-center rounded-md border border-[#CBD0CA] text-[#525F58] hover:border-[#3B82F6] hover:text-[#3B82F6] transition"
                     >
                       <Eye size={15} />
                     </button>
                     {unreadCount > 0 && (
                       <span
                         title="Has unread messages"
-                        className="w-8 h-8 flex items-center justify-center gap-1 rounded-md border border-[#CBD0CA] text-xs font-semibold text-[#2563EB]"
+                        className="w-8 h-8 flex items-center justify-center gap-1 rounded-md border border-[#CBD0CA] text-xs font-semibold text-[#3B82F6]"
                       >
                         <MessageCircle size={13} />
                         {unreadCount}
@@ -339,7 +339,7 @@ export default function CustomerDashboard() {
 
         <div className="p-4 border-t border-[#EDEFEF]">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-display font-semibold text-sm">
+            <div className="w-9 h-9 rounded-full bg-[#3B82F6] text-white flex items-center justify-center font-display font-semibold text-sm">
               {(profile.firstName || user.firstName)?.[0]?.toUpperCase() || 'U'}
             </div>
             <div>
@@ -350,7 +350,7 @@ export default function CustomerDashboard() {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 text-xs text-[#8A938D] hover:text-[#2563EB] transition"
+            className="w-full flex items-center gap-2 text-xs text-[#8A938D] hover:text-[#3B82F6] transition"
           >
             <LogOut size={14} />
             Log out
@@ -369,7 +369,7 @@ export default function CustomerDashboard() {
               </h1>
               <Link
                 to="/new-application"
-                className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2.5 px-5 rounded-md transition"
+                className="bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2.5 px-5 rounded-md transition"
               >
                 Create new application
               </Link>
@@ -389,7 +389,7 @@ export default function CustomerDashboard() {
             <div className="flex flex-col sm:flex-row gap-3 mb-5">
               <button
                 type="button"
-                className="flex items-center gap-2 bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm font-medium text-[#525F58] hover:border-[#2563EB] hover:text-[#2563EB] transition w-fit"
+                className="flex items-center gap-2 bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm font-medium text-[#525F58] hover:border-[#3B82F6] hover:text-[#3B82F6] transition w-fit"
               >
                 <Filter size={15} />
                 Filters
@@ -401,7 +401,7 @@ export default function CustomerDashboard() {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by reference, applicant, or property"
-                  className="w-full bg-white border border-[#CBD0CA] rounded-md pl-10 pr-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                  className="w-full bg-white border border-[#CBD0CA] rounded-md pl-10 pr-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
                 />
               </div>
             </div>
@@ -443,7 +443,7 @@ export default function CustomerDashboard() {
                 </div>
                 <button
                   onClick={startEditingSettings}
-                  className="mt-8 border border-[#2563EB] text-[#2563EB] font-semibold text-sm py-2.5 px-5 rounded-md hover:bg-[#2563EB] hover:text-white transition"
+                  className="mt-8 border border-[#3B82F6] text-[#3B82F6] font-semibold text-sm py-2.5 px-5 rounded-md hover:bg-[#3B82F6] hover:text-white transition"
                 >
                   Edit Details
                 </button>
@@ -514,7 +514,7 @@ export default function CustomerDashboard() {
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     onClick={saveSettings}
-                    className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-semibold text-sm py-2.5 px-5 rounded-md transition"
+                    className="bg-[#3B82F6] hover:bg-[#2563EB] text-white font-semibold text-sm py-2.5 px-5 rounded-md transition"
                   >
                     Save changes
                   </button>
@@ -542,11 +542,11 @@ export default function CustomerDashboard() {
             <div className="space-y-3">
               <div className="flex items-center justify-between border border-[#EDEFEF] rounded-lg px-5 py-4">
                 <span className="text-sm text-[#1E2422] font-medium">General enquiries</span>
-                <span className="text-sm text-[#2563EB] font-semibold">0800 111 999</span>
+                <span className="text-sm text-[#3B82F6] font-semibold">0800 111 999</span>
               </div>
               <div className="flex items-center justify-between border border-[#EDEFEF] rounded-lg px-5 py-4">
                 <span className="text-sm text-[#1E2422] font-medium">Smell gas / emergency</span>
-                <span className="text-sm text-[#2563EB] font-semibold">0800 111 999</span>
+                <span className="text-sm text-[#3B82F6] font-semibold">0800 111 999</span>
               </div>
             </div>
           </div>

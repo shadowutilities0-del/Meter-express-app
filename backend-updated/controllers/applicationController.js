@@ -106,9 +106,29 @@ exports.updateApplication = async (req, res) => {
 
     const previous = await Application.findOne({ ref: req.params.ref }, { status: 1 }).lean();
 
+    const statusChanged = !!(updates.status && previous && updates.status !== previous.status);
+
+    // Record every status change as a system note, so the customer's
+    // "Updates" feed (and the admin notes list) shows a timeline entry
+    // automatically — not just when notes are added by hand.
+    if (statusChanged) {
+      updates.$push = {
+        notes: {
+          id: genId('note'),
+          author: 'System',
+          role: 'system',
+          text: `Status changed to "${updates.status}".`,
+          time: new Date(),
+        },
+      };
+    }
+
+    const { $push, ...setFields } = updates;
+    const updateOp = $push ? { $set: setFields, $push } : { $set: setFields };
+
     const app = await Application.findOneAndUpdate(
       { ref: req.params.ref },
-      { $set: updates },
+      updateOp,
       { new: true }
     );
     if (!app) return res.status(404).json({ message: 'Application not found' });
@@ -117,7 +137,7 @@ exports.updateApplication = async (req, res) => {
 
     // Only email the customer if the status actually changed (this route
     // also handles other field edits, so don't fire on every save).
-    if (updates.status && previous && updates.status !== previous.status) {
+    if (statusChanged) {
       sendStatusUpdateToCustomer(app, updates.status).catch((err) =>
         console.error('Status-update email failed:', err)
       );
@@ -305,6 +325,15 @@ exports.requestMoreInfo = async (req, res) => {
           status: 'Request More Information',
           infoRequest: { question, askedAt: new Date(), response: null, respondedAt: null },
         },
+        $push: {
+          notes: {
+            id: genId('note'),
+            author: 'System',
+            role: 'system',
+            text: 'Status changed to "Request More Information".',
+            time: new Date(),
+          },
+        },
       },
       { new: true }
     );
@@ -334,6 +363,13 @@ exports.respondToInfoRequest = async (req, res) => {
     app.status = 'In Progress';
     app.infoRequest.response = responseText;
     app.infoRequest.respondedAt = new Date();
+    app.notes.push({
+      id: genId('note'),
+      author: 'System',
+      role: 'system',
+      text: 'Status changed to "In Progress".',
+      time: new Date(),
+    });
     app.messages.push({
       id: genId('m'),
       channel: 'customer',
@@ -383,6 +419,13 @@ exports.cancelApplication = async (req, res) => {
     const app = await Application.findOne({ ref: req.params.ref });
     if (!app) return res.status(404).json({ message: 'Application not found' });
     app.status = 'Application Cancelled';
+    app.notes.push({
+      id: genId('note'),
+      author: 'System',
+      role: 'system',
+      text: 'Status changed to "Application Cancelled".',
+      time: new Date(),
+    });
     app.messages.push({
       id: genId('m'),
       channel: 'customer',

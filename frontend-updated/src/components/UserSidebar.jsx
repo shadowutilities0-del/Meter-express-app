@@ -62,7 +62,7 @@ export default function UserSidebar({ activeKey, onNavigate }) {
 
       <div className="p-4 border-t border-[#EDEFEF]">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-9 h-9 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-display font-semibold text-sm">
+          <div className="w-9 h-9 rounded-full bg-[#3B82F6] text-white flex items-center justify-center font-display font-semibold text-sm">
             {user.firstName?.[0]?.toUpperCase() || 'U'}
           </div>
           <div>
@@ -73,7 +73,7 @@ export default function UserSidebar({ activeKey, onNavigate }) {
         <button
           type="button"
           onClick={handleLogout}
-          className="w-full flex items-center gap-2 text-xs text-[#8A938D] hover:text-[#2563EB] transition"
+          className="w-full flex items-center gap-2 text-xs text-[#8A938D] hover:text-[#3B82F6] transition"
         >
           <LogOut size={14} />
           Log out

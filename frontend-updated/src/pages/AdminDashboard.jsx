@@ -337,7 +337,7 @@ export default function AdminDashboard() {
         </nav>
         <div className="p-4 border-t border-[#EDEFEF]">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-full bg-[#2563EB] text-white flex items-center justify-center font-display font-semibold text-sm">
+            <div className="w-9 h-9 rounded-full bg-[#3B82F6] text-white flex items-center justify-center font-display font-semibold text-sm">
               {user.firstName?.[0]?.toUpperCase() || 'A'}
             </div>
             <div>
@@ -348,7 +348,7 @@ export default function AdminDashboard() {
           <button
             type="button"
             onClick={handleLogout}
-            className="w-full flex items-center gap-2 text-xs text-[#8A938D] hover:text-[#2563EB] transition"
+            className="w-full flex items-center gap-2 text-xs text-[#8A938D] hover:text-[#3B82F6] transition"
           >
             <LogOut size={14} />
             Log out
@@ -371,12 +371,12 @@ export default function AdminDashboard() {
                 placeholder="Search by reference, type, applicant, email, property, postcode, status, or date..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="flex-1 bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                className="flex-1 bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
               />
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] focus:outline-none focus:border-[#2563EB]"
+                className="bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] focus:outline-none focus:border-[#3B82F6]"
               >
                 <option>All</option>
                 {STATUS_OPTIONS.map((s) => (
@@ -426,7 +426,7 @@ export default function AdminDashboard() {
                             type="button"
                             title={job.status === 'Pending Review' ? 'Start reviewing' : 'View job'}
                             onClick={() => handleViewJob(job)}
-                            className="h-8 flex items-center gap-1.5 px-3 rounded-md border border-[#CBD0CA] text-[#525F58] hover:border-[#2563EB] hover:text-[#2563EB] transition text-xs font-semibold"
+                            className="h-8 flex items-center gap-1.5 px-3 rounded-md border border-[#CBD0CA] text-[#525F58] hover:border-[#3B82F6] hover:text-[#3B82F6] transition text-xs font-semibold"
                           >
                             <Eye size={14} />
                             {job.status === 'Pending Review' ? 'Review' : 'View'}
@@ -476,7 +476,7 @@ export default function AdminDashboard() {
                 placeholder="Search by customer name, email, or reference..."
                 value={customerSearch}
                 onChange={(e) => setCustomerSearch(e.target.value)}
-                className="flex-1 bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#2563EB]"
+                className="flex-1 bg-white border border-[#CBD0CA] rounded-md px-4 py-2.5 text-sm text-[#1E2422] placeholder-[#8A938D] focus:outline-none focus:border-[#3B82F6]"
               />
               <button
                 type="button"
@@ -484,7 +484,7 @@ export default function AdminDashboard() {
                 className={`px-4 py-2.5 rounded-md text-sm font-semibold border transition whitespace-nowrap ${
                   needsReplyOnly
                     ? 'bg-red-50 border-red-200 text-red-600'
-                    : 'bg-white border-[#CBD0CA] text-[#525F58] hover:border-[#2563EB]'
+                    : 'bg-white border-[#CBD0CA] text-[#525F58] hover:border-[#3B82F6]'
                 }`}
               >
                 {needsReplyOnly ? 'Showing: Needs reply' : 'Needs reply only'}
@@ -529,7 +529,7 @@ export default function AdminDashboard() {
                               markJobSeen(j);
                               navigate(`/admin-application/${j.ref}`);
                             }}
-                            className="flex items-center justify-between text-sm bg-white border border-[#EDEFEF] rounded-lg px-4 py-2.5 cursor-pointer hover:border-[#2563EB] transition"
+                            className="flex items-center justify-between text-sm bg-white border border-[#EDEFEF] rounded-lg px-4 py-2.5 cursor-pointer hover:border-[#3B82F6] transition"
                           >
                             <div className="min-w-0">
                               <p className="font-medium text-[#1E2422]">
@@ -596,7 +596,7 @@ export default function AdminDashboard() {
                 <span className="text-[#1E2422] font-medium">Administrator</span>
               </div>
             </div>
-            <button className="mt-8 border border-[#2563EB] text-[#2563EB] font-semibold text-sm py-2.5 px-5 rounded-md hover:bg-[#2563EB] hover:text-white transition">
+            <button className="mt-8 border border-[#3B82F6] text-[#3B82F6] font-semibold text-sm py-2.5 px-5 rounded-md hover:bg-[#3B82F6] hover:text-white transition">
               Edit Details
             </button>
           </div>
@@ -614,11 +614,11 @@ export default function AdminDashboard() {
             <div className="space-y-3">
               <div className="flex items-center justify-between border border-[#EDEFEF] rounded-lg px-5 py-4">
                 <span className="text-sm text-[#1E2422] font-medium">IT / systems support</span>
-                <span className="text-sm text-[#2563EB] font-semibold">0800 111 999</span>
+                <span className="text-sm text-[#3B82F6] font-semibold">0800 111 999</span>
               </div>
               <div className="flex items-center justify-between border border-[#EDEFEF] rounded-lg px-5 py-4">
                 <span className="text-sm text-[#1E2422] font-medium">Emergency escalation</span>
-                <span className="text-sm text-[#2563EB] font-semibold">0800 111 999</span>
+                <span className="text-sm text-[#3B82F6] font-semibold">0800 111 999</span>
               </div>
             </div>
           </div>
